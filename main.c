@@ -71,20 +71,19 @@ int get_all_expenses(){
 
 void init_dataset(struct Dataset *set){
 	FILE *f = fopen(set->file_path, "r");
-	size_t count = 256;
-	size_t buffer_size = 256;
-	char *buffer[count];
+	size_t count = 3;
+	char buffer[count];
 	if (f==NULL) {
 		return;
 	}
-	fread(buffer, buffer_size, count, f);
-	printf("%c", *buffer[0]);
+	fread(buffer, sizeof *buffer, 1, f);
+	printf("%c", buffer[3]);
 	
 }
 
 int main(int argc, char argv[]){
 	struct Dataset set = {"data-recurring"};
-	
+
 	init_dataset(&set);
 
 }
