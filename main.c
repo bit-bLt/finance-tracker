@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 enum expense_types{
 	BILL,LUXARY,FOOD,HOUSEHOLD	
@@ -13,7 +15,8 @@ struct Expense {
 
 struct Dataset{
 	char file_path[256];
-	struct Expense expenses[];
+	char **raw_file_data;
+	struct Expense expenses[1024];
 };
 
 void print_food(){
@@ -69,21 +72,53 @@ int get_all_expenses(){
 
 }
 
+int readline(char buffer[], FILE *stream){
+	int i = 0;
+	int c;
+	while (c = fgetc(stream)){
+		if (c == '\n') break;	
+		if (c == EOF){
+			return EOF;
+		}
+		buffer[i] = c;
+		i++;
+	}
+}
+
+void readlines(char *line_buffer[], FILE *stream){
+	int i = 0;
+	int c;
+	while (c != EOF){
+		char *new_buffer;
+		new_buffer = malloc(sizeof(new_buffer)*256);
+		c = readline(new_buffer, stream);
+		line_buffer[i] = new_buffer;
+		i++;
+	}
+}
+
 void init_dataset(struct Dataset *set){
 	FILE *f = fopen(set->file_path, "r");
-	size_t count = 3;
-	char buffer[count];
+
 	if (f==NULL) {
 		return;
 	}
-	fread(buffer, sizeof *buffer, 1, f);
-	printf("%c", buffer[3]);
 	
+	char *line_buffer[1000];
+	readlines(line_buffer, f);
+	
+	set->raw_file_data = line_buffer;
 }
 
 int main(int argc, char argv[]){
 	struct Dataset set = {"data-recurring"};
+	struct Dataset *setp;
+	setp = &set;
+	//FILE *f = fopen("data-recurring", "r");
+	//printf("%c", fgetc(f));
 
-	init_dataset(&set);
-
+	init_dataset(setp);
+	for (int i=0; setp->raw_file_data[i] != NULL; i++){
+		printf("%s\n", setp->raw_file_data[i]);
+	}
 }
