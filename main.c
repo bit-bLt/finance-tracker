@@ -85,6 +85,20 @@ int readline(char buffer[], FILE *stream){
 	}
 }
 
+int count_lines(FILE *stream){
+	fpos_t origin;
+	fgetpos(stream, &origin);
+	int count = 0;
+	fseek(stream, 0, SEEK_SET);
+	char buffer[256]; // Only needed for argument
+	int c;
+	while ((c = readline(buffer, stream)) != EOF){	
+		count++;
+	}
+	fsetpos(stream, &origin);
+	return count;	
+}
+
 void readlines(char *line_buffer[], FILE *stream){
 	int i = 0;
 	int c;
@@ -103,7 +117,7 @@ void init_dataset(struct Dataset *set){
 	if (f==NULL) {
 		return;
 	}
-	
+	printf("%d\n",count_lines(f));
 	char *line_buffer[1000];
 	readlines(line_buffer, f);
 	
@@ -114,8 +128,6 @@ int main(int argc, char argv[]){
 	struct Dataset set = {"data-recurring"};
 	struct Dataset *setp;
 	setp = &set;
-	//FILE *f = fopen("data-recurring", "r");
-	//printf("%c", fgetc(f));
 
 	init_dataset(setp);
 	for (int i=0; setp->raw_file_data[i] != NULL; i++){
